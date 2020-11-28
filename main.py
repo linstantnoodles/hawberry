@@ -44,18 +44,17 @@ if __name__ == '__main__':
             content = template.render(title=f'"{human_readable_name}"')
             with open(f"posts/{args.name}.md", "w") as f:
                 f.write(content)
-            #shutil.copyfile("posts/templates/default.md", f"posts/{args.name}") 
     if args.command == "serve":
         import http.server
         import socketserver
+        serve_path = os.path.join(pathlib.Path().absolute(), 'public')
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
-                serve_path = os.path.join(pathlib.Path().absolute(), 'public')
                 super().__init__(*args, directory=serve_path, **kwargs)
         PORT = 8080
         socketserver.TCPServer.allow_reuse_address = True
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
-            print("serving at port", PORT)
+            print(f"Serving files at {serve_path} on port {PORT}")
             httpd.serve_forever()
     if args.command == "build":
         from jinja2 import Environment, FileSystemLoader, select_autoescape
