@@ -65,6 +65,7 @@ if __name__ == '__main__':
         template = env.get_template('base.html')
         ignored = {"templates"}
         files = [f for f in os.listdir(f"posts") if f not in ignored]
+        post_metadata = []
         for fname in files:
             fp = os.path.join("posts", fname)
             with open(fp, 'r') as fc:
@@ -74,6 +75,12 @@ if __name__ == '__main__':
                 name_without_ext = os.path.splitext(fname)[0]
                 permalink = config.get("permalink", f"posts/{name_without_ext}")
                 post_dir = f"public/{permalink}"
+
+                post_metadata.append({
+                    "title": config.get("title"),
+                    "url": f"/{permalink}"
+                })
+
                 os.makedirs(post_dir, exist_ok=True)
                 with open(f"{post_dir}/index.html", "w") as output_file:
                     output_file.write(template.render(content=content))
@@ -85,4 +92,4 @@ if __name__ == '__main__':
                 template = env.get_template(full_path)
                 os.makedirs(f"public/{parent_path}", exist_ok=True)
                 with open(f"public/{full_path}", "w") as f:
-                    f.write(template.render())
+                    f.write(template.render(posts=post_metadata))
