@@ -3,7 +3,6 @@ import os
 import markdown2
 import re
 import shutil
-
 def parse(text):
     def match_and_advance(text, pattern):
         p = re.compile(pattern)
@@ -19,7 +18,6 @@ def parse(text):
         config[a.strip()] = b.strip()
     value, text = match_and_advance(text, "---\n")
     return text, config
-            
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog="Parsing")
     subparsers = parser.add_subparsers(help='sub-command help', dest='command')
@@ -64,3 +62,12 @@ if __name__ == '__main__':
                 name_without_ext = os.path.splitext(fname)[0]
                 with open(f"public/posts/{name_without_ext}.html", "w") as output_file:
                     output_file.write(template.render(content=content))
+        for dir_path, dirs, files in os.walk("pages"):
+            for name in files:
+                rp = dir_path.split('/')[1:]
+                parent_path = os.path.join(*rp) if rp else ""
+                full_path = os.path.join(*rp, name)
+                template = env.get_template(full_path)
+                os.makedirs(f"public/{parent_path}", exist_ok=True)
+                with open(f"public/{full_path}", "w") as f:
+                    f.write(template.render())
