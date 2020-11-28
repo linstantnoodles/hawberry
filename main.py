@@ -32,7 +32,19 @@ if __name__ == '__main__':
         if args.type == "site":
             shutil.copytree("directory", args.name)
         if args.type == "post":
-            shutil.copyfile("posts/templates/default.md", f"posts/{args.name}") 
+            if os.path.isfile(f"posts/{args.name}.md"):
+                raise FileExistsError(f"post {args.name}.md already exists")
+            from jinja2 import Environment, FileSystemLoader, select_autoescape
+            env = Environment(
+                loader=FileSystemLoader(['posts/templates']),
+                autoescape=select_autoescape(['html', 'xml'])
+            )
+            template = env.get_template('default.md')
+            human_readable_name = " ".join([x.capitalize() for x in args.name.split("-")])
+            content = template.render(title=f'"{human_readable_name}"')
+            with open(f"posts/{args.name}.md", "w") as f:
+                f.write(content)
+            #shutil.copyfile("posts/templates/default.md", f"posts/{args.name}") 
     if args.command == "serve":
         import http.server
         import socketserver
