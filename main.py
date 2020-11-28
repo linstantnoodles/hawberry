@@ -3,6 +3,7 @@ import os
 import markdown2
 import re
 import shutil
+import pathlib
 def parse(text):
     def match_and_advance(text, pattern):
         p = re.compile(pattern)
@@ -37,8 +38,8 @@ if __name__ == '__main__':
         import socketserver
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
-                # FIXME: this should serve when run in the root project 
-                super().__init__(*args, directory="public/", **kwargs)
+                serve_path = os.path.join(pathlib.Path().absolute(), 'public')
+                super().__init__(*args, directory=serve_path, **kwargs)
         PORT = 8080
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             print("serving at port", PORT)
