@@ -41,6 +41,7 @@ if __name__ == '__main__':
                 serve_path = os.path.join(pathlib.Path().absolute(), 'public')
                 super().__init__(*args, directory=serve_path, **kwargs)
         PORT = 8080
+        socketserver.TCPServer.allow_reuse_address = True
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             print("serving at port", PORT)
             httpd.serve_forever()
