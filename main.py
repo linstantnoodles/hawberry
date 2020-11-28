@@ -46,6 +46,12 @@ if __name__ == '__main__':
             print("serving at port", PORT)
             httpd.serve_forever()
     if args.command == "build":
+        from jinja2 import Environment, FileSystemLoader, select_autoescape
+        env = Environment(
+            loader=FileSystemLoader(['layouts', 'pages']),
+            autoescape=select_autoescape(['html', 'xml'])
+        )
+        template = env.get_template('base.html')
         ignored = {"templates"}
         files = [f for f in os.listdir(f"posts") if f not in ignored]
         for fname in files:
@@ -54,10 +60,7 @@ if __name__ == '__main__':
                 rawc = fc.read()
                 text, config = parse(rawc)
                 content = markdown2.markdown(text).strip()
-                with open("layouts/base.html", 'r') as base:
-                    base_content = base.read()
-                    output = base_content.replace("{{content}}", content)
-                    os.makedirs("public/posts", exist_ok=True)
-                    name_without_ext = os.path.splitext(fname)[0]
-                    with open(f"public/posts/{name_without_ext}.html", "w") as output_file:
-                        output_file.write(output)
+                os.makedirs("public/posts", exist_ok=True)
+                name_without_ext = os.path.splitext(fname)[0]
+                with open(f"public/posts/{name_without_ext}.html", "w") as output_file:
+                    output_file.write(template.render(content=content))
