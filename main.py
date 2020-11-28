@@ -72,9 +72,11 @@ if __name__ == '__main__':
                 rawc = fc.read()
                 text, config = parse(rawc)
                 content = markdown2.markdown(text).strip()
-                os.makedirs("public/posts", exist_ok=True)
                 name_without_ext = os.path.splitext(fname)[0]
-                with open(f"public/posts/{name_without_ext}.html", "w") as output_file:
+                permalink = config.get("permalink", f"posts/{name_without_ext}")
+                post_dir = f"public/{permalink}"
+                os.makedirs(post_dir, exist_ok=True)
+                with open(f"{post_dir}/index.html", "w") as output_file:
                     output_file.write(template.render(content=content))
         for dir_path, dirs, files in os.walk("pages"):
             for name in files:
